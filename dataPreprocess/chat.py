@@ -1,7 +1,10 @@
 import openai
 import argparse
 
-openai.api_key = "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"
+with open("apiKey.txt") as f:
+    lines = f.read().splitlines()
+
+openai.api_key = lines[0]
 
 p = argparse.ArgumentParser(description="ChatGPT on terminal")
 p.add_argument("input", help="Input question")
