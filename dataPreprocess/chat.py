@@ -7,21 +7,22 @@ with open("apiKey.txt") as f:
 
 openai.api_key = lines[0]
 
-dataFrame = pd.read_csv("AlexaReviews.csv")
-dataFrame.drop(["rating", "date", "variation"], axis=1)
+dataFrame = pd.read_csv("questions_new.csv")
+# dataFrame.drop(["rating", "date", "variation"], axis=1)
 
 model_engine = "text-davinci-003"
 
-with open('AlexaCombinedReviews.csv', 'a') as f_object:
+with open('answers_new.csv', 'a') as f_object:
     writer_object = writer(f_object)
-    writer_object.writerow(["verified_reviews", "paraphrased_reviews"])
+    writer_object.writerow(["answers"])
     f_object.close()
 
 count = 0
-for row in dataFrame["verified_reviews"]:
+for row in dataFrame["questions"]:
     # Set up the model and prompt
     responseList = []
-    prompt = f'paraphrase the following: {row}'
+    prompt = f'{row}'
+    print(prompt)
 
     completion = openai.Completion.create(
         engine=model_engine,
@@ -32,13 +33,24 @@ for row in dataFrame["verified_reviews"]:
         temperature=0.5,
     )
 
-    response = completion.choices[0].text
-    responseList.append(row)
-    responseList.append(response)
-    with open('AlexaCombinedReviews.csv', 'a') as f_object:
-        writer_object = writer(f_object)
-        writer_object.writerow(responseList)
-        f_object.close()
+    response = completion.choices[0].text.split("\n\n")
+    # print(response)
+    for item in response:
+        # str = ''
+        # if item == "":
+        #     continue
+        # if ": " in item:
+        #     str += item.split(": ")[1]
+        with open('answers_new.csv', 'a') as f_object:
+            writer_object = writer(f_object)
+            writer_object.writerow([item])
+            f_object.close()
+    # responseList.append(row)
+    # responseList.append(response)
+    # with open('AlexaCombinedReviews.csv', 'a') as f_object:
+    #     writer_object = writer(f_object)
+    #     writer_object.writerow(responseList)
+    #     f_object.close()
     print(count)
     count += 1
 
